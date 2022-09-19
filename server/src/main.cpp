@@ -1,7 +1,4 @@
-// TODO
-// ball handling -> actually let the ball move and send informatin about where its going
-// collision handling -> deciding when a ball has hit a player, server side or client side?
-
+//todo always run and accept max 2 connections
 #include <SFML/Network.hpp>
 #include <iostream>
 #include <thread>
@@ -14,7 +11,9 @@ struct player{
 	sf::TcpSocket socket;
 	sf::Socket::Status status;
 	string username;
+
 	float pos;
+	bool side;
 };
 
 int main(){
@@ -45,30 +44,31 @@ int main(){
 		packet.clear();
 
 		clients[i].status = sf::Socket::Done;
+		clients[i].side = i;
 	}
 
 	// Exchange usernames
-	cout << "Both players found. Exchanging usernames..." << endl;
+	cout << "Both players found. Exchanging information..." << endl;
 
-	packet << clients[1].username;
+	packet << clients[1].username << clients[0].side;
 	clients[0].socket.send(packet);
 	packet.clear();
 
-	packet << clients[0].username;
+	packet << clients[0].username << clients[1].side;
 	clients[1].socket.send(packet);
 	packet.clear();
 
 	cout << "Starting game loop..." << endl;
 
-	// this could be better...
+	float bx, by;
     thread t1([&]() {
         while (clients[0].status == sf::Socket::Done) {
 			sf::Packet p;
 			clients[0].status = clients[0].socket.receive(p);
-			p >> clients[0].pos;
+			p >> clients[0].pos >> bx >> by;
 			p.clear();
 
-			p << clients[0].pos;
+			p << clients[0].pos << bx << by;
 			clients[1].socket.send(p);
 			p.clear();
         }
@@ -82,10 +82,10 @@ int main(){
         while (clients[1].status == sf::Socket::Done) {
 			sf::Packet p;
 			clients[1].status = clients[1].socket.receive(p);
-			p >> clients[1].pos;
+			p >> clients[1].pos >> bx >> by;
 			p.clear();
 
-			p << clients[1].pos;
+			p << clients[1].pos << bx << by;
 			clients[0].socket.send(p);
 			p.clear();
         }

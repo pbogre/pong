@@ -35,10 +35,17 @@ int main(){
 	player opponent;
 	opponent.pos = 0;
 	socket.receive(packet);
-	packet >> opponent.username;
+	packet >> opponent.username >> client.side;
+	opponent.side = !client.side;
 	packet.clear();
 
+	cout << "Opponent: " << opponent.username << endl;
+	cout << "Side: " << client.side << endl;
+	cout << "Opponent found. Starting game loop..." << endl;
+	//Todo fix username exchange for first user to connect
+
 	sf::RenderWindow window(sf::VideoMode(1300, 800), "pong");
+	window.setFramerateLimit(20);
 	while(window.isOpen()){
 		sf::Event event;
 
@@ -57,20 +64,17 @@ int main(){
 
 		window.clear(sf::Color::Black);
 
-		//cout << client.pos << "	" << opponent.pos << endl;
-
-		packet << client.pos;
+		packet << client.pos << ball.px << ball.py;
 		socket.send(packet);
 		packet.clear();
 
 		if(opponent.pos >= 0){
 			socket.receive(packet);
-			packet >> opponent.pos;
+			packet >> opponent.pos >> ball.px >> ball.py;
 			packet.clear();
 		}
 
-		draw_players(window, client, opponent);
-		draw_ball(window, window.getSize().x / 2, window.getSize().y / 2);
+		update(window, client, opponent);
 
 		window.display();
 	}
@@ -78,7 +82,4 @@ int main(){
 	// start game here and let guy move around while waiting for an opponent
 	// this means that, server side, as soon as an opponent is found the information exchange 
 	// (name + pos) starts
-
-	cout << "Opponent: " << opponent.username << endl;
-	cout << "Opponent found. Starting game loop..." << endl;
 }
