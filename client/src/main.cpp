@@ -42,10 +42,9 @@ int main(){
 	cout << "Opponent: " << opponent.username << endl;
 	cout << "Side: " << client.side << endl;
 	cout << "Opponent found. Starting game loop..." << endl;
-	//Todo fix username exchange for first user to connect
 
 	sf::RenderWindow window(sf::VideoMode(1300, 800), "pong");
-	window.setFramerateLimit(20);
+	window.setFramerateLimit(30);
 	while(window.isOpen()){
 		sf::Event event;
 
@@ -74,7 +73,9 @@ int main(){
 			packet.clear();
 		}
 
+		draw_score();
 		update(window, client, opponent);
+		cout << client.score << " | " << opponent.score << endl;
 
 		window.display();
 	}
