@@ -3,7 +3,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "config.h"
-#include "game.hpp"
+#include "game.cpp"
 using namespace std;
 
 int main(){
@@ -43,16 +43,15 @@ int main(){
 	cout << "Side: " << client.side << endl;
 	cout << "Opponent found. Starting game loop..." << endl;
 
-	sf::RenderWindow window(sf::VideoMode(1300, 800), "pong");
-	window.setFramerateLimit(30);
-	while(window.isOpen()){
+	Game game(client, opponent);
+	while(game.get_window()->isOpen()){
 		sf::Event event;
 
-		while(window.pollEvent(event)){
-			if(event.type == sf::Event::Closed) window.close();
+		while(game.get_window()->pollEvent(event)){
+			if(event.type == sf::Event::Closed) game.get_window()->close();
 			if (event.type == sf::Event::Resized){
         		sf::FloatRect visibleArea(0, 0, event.size.width, event.size.height);
-        		window.setView(sf::View(visibleArea));
+        		game.get_window()->setView(sf::View(visibleArea));
     		}
 
 			if(event.type == sf::Event::KeyPressed){
@@ -60,8 +59,6 @@ int main(){
 				if(event.key.code == sf::Keyboard::Down && client.pos < 60) client.pos += 4;
 			}
 		}
-
-		window.clear(sf::Color::Black);
 
 		packet << client.pos << ball.px << ball.py;
 		socket.send(packet);
@@ -73,11 +70,10 @@ int main(){
 			packet.clear();
 		}
 
-		draw_score();
-		update(window, client, opponent);
-		cout << client.score << " | " << opponent.score << endl;
+		game.draw_score();
+		game.update();
+		game.display();
 
-		window.display();
 	}
 
 	// start game here and let guy move around while waiting for an opponent
