@@ -1,3 +1,6 @@
+// note that because the game is handled client-side,
+// it is very easy to modify it and get an advantage over
+// your opponent
 #include "game.hpp"
 
 Game::Game(player &client, player &opponent){
@@ -37,8 +40,8 @@ void Game::display(){
 void Game::draw_score(){
     score_l.setString(std::to_string(left->score));
     score_r.setString(std::to_string(right->score));
-    window.draw(score_l);
-    window.draw(score_r);
+    if(left->pos >= 0)  window.draw(score_l);
+    if(right->pos >= 0) window.draw(score_r);
 }
 
 void Game::update(){
@@ -57,17 +60,15 @@ void Game::update(){
     }
 
     //Handle Ball Collision
-    //todo ball gets fucked when resizing
     //todo display names
     //todo change dy based on where the ball hits the player
-    //todo initial dy random
     float rx = (ball.px * window.getSize().x) / 100;
     float ry = (ball.py * window.getSize().y) / 100;
     if(rx + ball.size >= right_x){
-        if(ry >= right_y && ry + ball.size <= right_y + right->shape.getSize().y){ 
+        if(ry >= right_y - ball.size && ry + ball.size <= right_y + right->shape.getSize().y + ball.size){ 
             ball.shape.setFillColor(sf::Color::White);
             ball.dx *= -1;
-            ball.dx += 0.01;
+            ball.dx -= 0.1;
         }
         else{
             ball.px = 50 - ((ball.size / window.getSize().x) * 100);
@@ -79,10 +80,10 @@ void Game::update(){
         }
     }
     if(rx - ball.size <= left_x){
-        if(ry >= left_y && ry + ball.size <= left_y + left->shape.getSize().y){
+        if(ry >= left_y - ball.size && ry + ball.size <= left_y + left->shape.getSize().y + ball.size){
             ball.shape.setFillColor(sf::Color::White);
             ball.dx *= -1;
-            ball.dx += 0.05;
+            ball.dx += 0.1;
         }
         else{
             ball.px = 50 - ((ball.size / window.getSize().x) * 100);

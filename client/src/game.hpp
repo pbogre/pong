@@ -1,6 +1,11 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 
+float get_rand(){
+   float max = 3.0;
+   return static_cast<float>(rand()) / (static_cast <float> (RAND_MAX/max));
+}
+
 struct player{
     string username;
     bool status;
@@ -13,6 +18,7 @@ struct player{
 
 struct ball{
 	int size = 35;
+
 	float dx = 0.5, dy = 0.5;
 	float px = 50 - size,
 		  py = 50 - size;

@@ -31,6 +31,10 @@ int main(){
 	packet.clear();
 	
 	cout << "Setup information sent, waiting for opponent..." << endl;
+
+	// start game here and let guy move around while waiting for an opponent
+	// this means that, server side, as soon as an opponent is found the information exchange 
+	// (name + pos) starts
 	
 	player opponent;
 	opponent.pos = 0;
@@ -60,23 +64,18 @@ int main(){
 			}
 		}
 
-		packet << client.pos << ball.px << ball.py;
+		packet << client.pos;
 		socket.send(packet);
 		packet.clear();
 
 		if(opponent.pos >= 0){
 			socket.receive(packet);
-			packet >> opponent.pos >> ball.px >> ball.py;
+			packet >> opponent.pos;
 			packet.clear();
 		}
 
 		game.draw_score();
 		game.update();
 		game.display();
-
 	}
-
-	// start game here and let guy move around while waiting for an opponent
-	// this means that, server side, as soon as an opponent is found the information exchange 
-	// (name + pos) starts
 }

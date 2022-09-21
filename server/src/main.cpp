@@ -66,10 +66,10 @@ int main(){
 			while (clients[0].status == sf::Socket::Done) {
 				sf::Packet p;
 				clients[0].status = clients[0].socket.receive(p);
-				p >> clients[0].pos >> bx >> by;
+				p >> clients[0].pos;
 				p.clear();
 
-				p << clients[0].pos << bx << by;
+				p << clients[0].pos;
 				clients[1].socket.send(p);
 				p.clear();
 			}
