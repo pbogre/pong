@@ -3,6 +3,7 @@
 // your opponent
 #include "game.hpp"
 
+//todo display names
 Game::Game(player &client, player &opponent){
     window.create({1300, 800, 32}, "pong");
     window.setFramerateLimit(30);
@@ -37,11 +38,22 @@ void Game::display(){
     window.clear(sf::Color::Black);
 }
 
+//todo fix pos when resizing window
 void Game::draw_score(){
     score_l.setString(std::to_string(left->score));
     score_r.setString(std::to_string(right->score));
     if(left->pos >= 0)  window.draw(score_l);
     if(right->pos >= 0) window.draw(score_r);
+}
+
+// i'm not sure how the classic pong 
+// game calculated the dy after collision
+// but this method is fun and 
+// adds skill to the game imo
+float Game::rebound(float paddle_y, float paddle_size, float ball_y){
+    float M_ball = (ball_y + ball.size) + ball_y / 2;
+    float M_paddle = (paddle_y + paddle_size) + paddle_y / 2;
+    return (M_ball - M_paddle) / BOUNCE_FACTOR;
 }
 
 void Game::update(){
@@ -60,13 +72,11 @@ void Game::update(){
     }
 
     //Handle Ball Collision
-    //todo display names
-    //todo change dy based on where the ball hits the player
     float rx = (ball.px * window.getSize().x) / 100;
     float ry = (ball.py * window.getSize().y) / 100;
     if(rx + ball.size >= right_x){
         if(ry >= right_y - ball.size && ry + ball.size <= right_y + right->shape.getSize().y + ball.size){ 
-            ball.shape.setFillColor(sf::Color::White);
+            ball.dy = rebound(right_y, right->shape.getSize().y, ry);
             ball.dx *= -1;
             ball.dx -= 0.1;
         }
@@ -81,7 +91,7 @@ void Game::update(){
     }
     if(rx - ball.size <= left_x){
         if(ry >= left_y - ball.size && ry + ball.size <= left_y + left->shape.getSize().y + ball.size){
-            ball.shape.setFillColor(sf::Color::White);
+            ball.dy = rebound(left_y, left->shape.getSize().y, ry);
             ball.dx *= -1;
             ball.dx += 0.1;
         }
