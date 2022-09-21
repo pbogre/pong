@@ -5,7 +5,7 @@
 
 //todo display names
 Game::Game(player &client, player &opponent){
-    window.create({1300, 800, 32}, "pong");
+    window.create({1100, 650, 32}, "pong", sf::Style::Close);
     window.setFramerateLimit(30);
 
     if(client.side){
@@ -17,16 +17,35 @@ Game::Game(player &client, player &opponent){
         right = &opponent;
     }
 
-    font.loadFromFile("../res/squarechunks.ttf");
-        score_l.setFont(font);
-        score_l.setCharacterSize(72);
-        score_l.setFillColor(sf::Color(105, 105, 105));
-        score_l.setPosition(window.getSize().x / 3, 10);
+    right_x = window.getSize().x - 80;
+    left_x = 50;
 
-        score_r.setFont(font);
+    score_font.loadFromFile("../res/squarechunks.ttf");
+        score_l.setFont(score_font);
+        score_l.setCharacterSize(72);
+        score_l.setString("0");
+        score_l.setFillColor(sf::Color(105, 105, 105));
+        score_l.setPosition(window.getSize().x / 3 - (score_l.getLocalBounds().width), 10);
+
+        score_r.setFont(score_font);
         score_r.setCharacterSize(72);
+        score_r.setString("0");
         score_r.setFillColor(sf::Color(105, 105, 105));
-        score_r.setPosition(2 * window.getSize().x / 3, 10);
+        score_r.setPosition((2 * window.getSize().x / 3) + (score_r.getLocalBounds().width), 10);
+
+    name_font.loadFromFile("../res/arial.ttf");
+        name_l.setFont(name_font);
+        name_l.setString(left->username);
+        name_l.setCharacterSize(36);
+        name_l.setFillColor(sf::Color(105, 105, 105));
+        // score_M - (name.x / 2)
+        name_l.setPosition((score_l.getPosition().x + score_l.getLocalBounds().width / 2) - (name_l.getLocalBounds().width / 2), score_l.getLocalBounds().height + name_l.getLocalBounds().height);
+
+        name_r.setFont(name_font);
+        name_r.setString(right->username);
+        name_r.setCharacterSize(36);
+        name_r.setFillColor(sf::Color(105, 105, 105));
+        name_r.setPosition((score_r.getPosition().x + score_r.getLocalBounds().width / 2) - (name_r.getLocalBounds().width / 2), score_r.getLocalBounds().height + name_r.getLocalBounds().height);
 }
 
 sf::RenderWindow *Game::get_window(){
@@ -38,12 +57,26 @@ void Game::display(){
     window.clear(sf::Color::Black);
 }
 
+void Game::recalc_pos(){
+    score_r.setPosition(2 * window.getSize().x / 3, 10);
+    score_l.setPosition(window.getSize().x / 3, 10);
+
+    name_l.setPosition((score_l.getPosition().x + score_l.getLocalBounds().width / 2) - (name_l.getLocalBounds().width / 2), score_l.getLocalBounds().height + name_l.getLocalBounds().height);
+    name_r.setPosition((score_r.getPosition().x + score_r.getLocalBounds().width / 2) - (name_r.getLocalBounds().width / 2), score_r.getLocalBounds().height + name_r.getLocalBounds().height);
+}
+
 //todo fix pos when resizing window
-void Game::draw_score(){
+void Game::draw_text(){
     score_l.setString(std::to_string(left->score));
     score_r.setString(std::to_string(right->score));
-    if(left->pos >= 0)  window.draw(score_l);
-    if(right->pos >= 0) window.draw(score_r);
+    if(left->pos >= 0){
+        window.draw(score_l);
+        window.draw(name_l);
+    }
+    if(right->pos >= 0){
+        window.draw(score_r);
+        window.draw(name_r);
+    }
 }
 
 // i'm not sure how the classic pong 
@@ -57,14 +90,14 @@ float Game::rebound(float paddle_y, float paddle_size, float ball_y){
 }
 
 void Game::update(){
-    // Draw Players
-    float right_x = window.getSize().x - 80;
+    // Draw Players and Usernames
     float right_y = (right->pos * window.getSize().y) / 100;
-    float left_x = 50;
     float left_y = (left->pos * window.getSize().y) / 100;
 
-    left->shape.setPosition(left_x, left_y);
-    window.draw(left->shape);
+    if(left->pos >= 0){
+        left->shape.setPosition(left_x, left_y);
+        window.draw(left->shape);
+    }
 
     if(right->pos >= 0){
         right->shape.setPosition(right_x, right_y);

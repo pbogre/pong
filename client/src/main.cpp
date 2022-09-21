@@ -51,16 +51,25 @@ int main(){
 	while(game.get_window()->isOpen()){
 		sf::Event event;
 
+		// TODO
+		// resizing messes up a large portion of the game
+		// since its ran client-side.
+		// fixes: 
+		// 	- handle game server side and just send information about it
+		//  - [bandaid] dont allow resize
+		//  - use percentages for size of paddle & ball and render based on wx & wy
 		while(game.get_window()->pollEvent(event)){
 			if(event.type == sf::Event::Closed) game.get_window()->close();
 			if (event.type == sf::Event::Resized){
         		sf::FloatRect visibleArea(0, 0, event.size.width, event.size.height);
         		game.get_window()->setView(sf::View(visibleArea));
+
+				game.recalc_pos();
     		}
 
 			if(event.type == sf::Event::KeyPressed){
 				if(event.key.code == sf::Keyboard::Up && client.pos > 0) client.pos -= 4;
-				if(event.key.code == sf::Keyboard::Down && client.pos < 60) client.pos += 4;
+				if(event.key.code == sf::Keyboard::Down && client.pos < 100 - (100 * (client.shape.getSize().y / game.get_window()->getSize().y))) client.pos += 4; // https://www.desmos.com/calculator/21velxom2j
 			}
 		}
 
@@ -74,7 +83,7 @@ int main(){
 			packet.clear();
 		}
 
-		game.draw_score();
+		game.draw_text();
 		game.update();
 		game.display();
 	}
