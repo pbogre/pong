@@ -1,4 +1,3 @@
-//todo always run and accept max 2 connections
 #include <SFML/Network.hpp>
 #include <iostream>
 #include <thread>
@@ -61,7 +60,6 @@ int main(){
 
 		cout << "Starting game loop..." << endl;
 
-		float bx, by;
 		thread t1([&]() {
 			while (clients[0].status == sf::Socket::Done) {
 				sf::Packet p;
@@ -83,10 +81,10 @@ int main(){
 			while (clients[1].status == sf::Socket::Done) {
 				sf::Packet p;
 				clients[1].status = clients[1].socket.receive(p);
-				p >> clients[1].pos >> bx >> by;
+				p >> clients[1].pos;
 				p.clear();
 
-				p << clients[1].pos << bx << by;
+				p << clients[1].pos;
 				clients[0].socket.send(p);
 				p.clear();
 			}
