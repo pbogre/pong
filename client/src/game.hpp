@@ -27,7 +27,7 @@ class Game{
         void update();
         void draw_text();
         void display();
-        void recalc_pos();
+        //void recalc_pos();
     private:
         sf::RenderWindow window;
         sf::Font score_font, name_font;

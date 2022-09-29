@@ -8,7 +8,7 @@ FetchContent_Declare(SFML
 FetchContent_MakeAvailable(SFML)
 
 add_executable(server src/main.cpp)
-target_link_libraries(server PRIVATE sfml-network sfml-system)
+target_link_libraries(server PRIVATE sfml-network)
 target_compile_features(server PRIVATE cxx_std_17)
 if (WIN32 AND BUILD_SHARED_LIBS)
     add_custom_command(TARGET server POST_BUILD

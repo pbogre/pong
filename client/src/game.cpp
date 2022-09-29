@@ -1,9 +1,22 @@
 // note that because the game is handled client-side,
 // it is very easy to modify it and get an advantage over
 // your opponent
+
+//todo check if client can connect to server
+
+// MAJOR TODO
+// game handling client-side causes a lot of desync.
+// pass dydx and other important values and let server 
+// calculate position of ball for next frame? or something
+
+// values for collison handling:
+// - right_x, right_y1, right_y2
+// - left_x, left_y1, left_y2
+// - ball_x, ball_y, ball_size
+// - ball_dx, ball_dy
+// - window_x, window_y
 #include "game.hpp"
 
-//todo display names
 Game::Game(player &client, player &opponent){
     window.create({1100, 650, 32}, "pong", sf::Style::Close);
     window.setFramerateLimit(30);
@@ -17,8 +30,8 @@ Game::Game(player &client, player &opponent){
         right = &opponent;
     }
 
-    right_x = window.getSize().x - 80;
-    left_x = 50;
+    right_x = window.getSize().x - (2 * right->shape.getSize().x);
+    left_x = left->shape.getSize().x;
 
     score_font.loadFromFile("../res/squarechunks.ttf");
         score_l.setFont(score_font);
@@ -38,7 +51,7 @@ Game::Game(player &client, player &opponent){
         name_l.setString(left->username);
         name_l.setCharacterSize(36);
         name_l.setFillColor(sf::Color(105, 105, 105));
-        // score_M - (name.x / 2)
+        // score_M - (name.width / 2)
         name_l.setPosition((score_l.getPosition().x + score_l.getLocalBounds().width / 2) - (name_l.getLocalBounds().width / 2), score_l.getLocalBounds().height + name_l.getLocalBounds().height);
 
         name_r.setFont(name_font);
@@ -55,14 +68,6 @@ sf::RenderWindow *Game::get_window(){
 void Game::display(){
     window.display();
     window.clear(sf::Color::Black);
-}
-
-void Game::recalc_pos(){
-    score_r.setPosition(2 * window.getSize().x / 3, 10);
-    score_l.setPosition(window.getSize().x / 3, 10);
-
-    name_l.setPosition((score_l.getPosition().x + score_l.getLocalBounds().width / 2) - (name_l.getLocalBounds().width / 2), score_l.getLocalBounds().height + name_l.getLocalBounds().height);
-    name_r.setPosition((score_r.getPosition().x + score_r.getLocalBounds().width / 2) - (name_r.getLocalBounds().width / 2), score_r.getLocalBounds().height + name_r.getLocalBounds().height);
 }
 
 //todo fix pos when resizing window

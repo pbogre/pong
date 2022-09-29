@@ -64,7 +64,7 @@ int main(){
         		sf::FloatRect visibleArea(0, 0, event.size.width, event.size.height);
         		game.get_window()->setView(sf::View(visibleArea));
 
-				game.recalc_pos();
+				//game.recalc_pos();
     		}
 
 			if(event.type == sf::Event::KeyPressed){
