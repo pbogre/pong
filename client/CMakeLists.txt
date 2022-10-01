@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
-project(client LANGUAGES CXX)
+set(PROJECT_NAME client)
+project(${PROJECT_NAME} LANGUAGES CXX)
 
 include(FetchContent)
 FetchContent_Declare(SFML
@@ -7,12 +8,13 @@ FetchContent_Declare(SFML
     GIT_TAG 2.6.x)
 FetchContent_MakeAvailable(SFML)
 
-add_executable(client src/main.cpp)
-target_link_libraries(client PRIVATE sfml-graphics sfml-network)
-target_compile_features(client PRIVATE cxx_std_17)
+add_executable(${PROJECT_NAME} src/main.cpp)
+target_include_directories(${PROJECT_NAME} PRIVATE "res" "src")
+target_link_libraries(${PROJECT_NAME} PRIVATE sfml-graphics sfml-network)
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 if (WIN32 AND BUILD_SHARED_LIBS)
-    add_custom_command(TARGET client POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:client> $<TARGET_FILE_DIR:client> COMMAND_EXPAND_LISTS)
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:${PROJECT_NAME}> $<TARGET_FILE_DIR:${PROJECT_NAME}> COMMAND_EXPAND_LISTS)
 endif()
 
-install(TARGETS client)
+install(TARGETS ${PROJECT_NAME})
