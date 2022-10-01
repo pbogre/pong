@@ -1,20 +1,8 @@
-// note that because the game is handled client-side,
-// it is very easy to modify it and get an advantage over
-// your opponent
-
-//todo check if client can connect to server
-
 // MAJOR TODO
 // game handling client-side causes a lot of desync.
 // pass dydx and other important values and let server 
 // calculate position of ball for next frame? or something
-
-// values for collison handling:
-// - right_x, right_y1, right_y2
-// - left_x, left_y1, left_y2
-// - ball_x, ball_y, ball_size
-// - ball_dx, ball_dy
-// - window_x, window_y
+#include <cmath>
 #include "game.hpp"
 
 Game::Game(player &client, player &opponent){
@@ -84,14 +72,19 @@ void Game::draw_text(){
     }
 }
 
-// i'm not sure how the classic pong 
-// game calculated the dy after collision
-// but this method is fun and 
-// adds skill to the game imo
+float Game::middle_point(sf::RectangleShape shape){
+    return ((2 * shape.getPosition().y) + shape.getSize().y) / 2;
+}
+
 float Game::rebound(float paddle_y, float paddle_size, float ball_y){
     float M_ball = (ball_y + ball.size) + ball_y / 2;
     float M_paddle = (paddle_y + paddle_size) + paddle_y / 2;
-    return (M_ball - M_paddle) / BOUNCE_FACTOR;
+    float diff = M_paddle - M_ball;
+
+    // https://www.desmos.com/calculator/ks0lsoofuh, sigmoid function used for normalization
+    // different paddle/ball sizes may need a different exponential coefficient ( change 0.02 )
+    float normalized_rebound = ( -4 / (1 + exp(0.02 * diff)) ) + 2;
+    return normalized_rebound;
 }
 
 void Game::update(){
@@ -114,7 +107,7 @@ void Game::update(){
     float ry = (ball.py * window.getSize().y) / 100;
     if(rx + ball.size >= right_x){
         if(ry >= right_y - ball.size && ry + ball.size <= right_y + right->shape.getSize().y + ball.size){ 
-            ball.dy = rebound(right_y, right->shape.getSize().y, ry);
+            ball.dy = ball.defdy * rebound(right_y, right->shape.getSize().y, ry);
             ball.dx *= -1;
             ball.dx -= 0.1;
         }
@@ -129,7 +122,7 @@ void Game::update(){
     }
     if(rx - ball.size <= left_x){
         if(ry >= left_y - ball.size && ry + ball.size <= left_y + left->shape.getSize().y + ball.size){
-            ball.dy = rebound(left_y, left->shape.getSize().y, ry);
+            ball.dy = ball.defdy * rebound(left_y, left->shape.getSize().y, ry);
             ball.dx *= -1;
             ball.dx += 0.1;
         }
@@ -146,7 +139,7 @@ void Game::update(){
     if(ry <= 0) ball.dy *= -1;
 
     ball.px += ball.dx;
-    ball.py += ball.dy;
+    ball.py -= ball.dy;
     rx = (ball.px * window.getSize().x) / 100;
     ry = (ball.py * window.getSize().y) / 100;
     ball.shape.setPosition(rx, ry);

@@ -13,7 +13,7 @@ struct player{
 struct ball{
 	int size = 35;
 
-	float dx = 0.5, dy = 0.5;
+	float dx = 0.5, dy = 0.5, defdy = dy;
 	float px = 50,
 		  py = 50;
 
@@ -38,6 +38,6 @@ class Game{
         float right_x;
         float left_x;
 
-        int BOUNCE_FACTOR = 100; // determines rebound angle magnitude
         float rebound(float, float, float);
+        float middle_point(sf::RectangleShape shape);
 };
