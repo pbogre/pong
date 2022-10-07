@@ -66,11 +66,14 @@ int main(){
 
 				//game.recalc_pos();
     		}
+		}
 
-			if(event.type == sf::Event::KeyPressed){
-				if(event.key.code == sf::Keyboard::Up && client.pos > 0) client.pos -= 4;
-				if(event.key.code == sf::Keyboard::Down && client.pos < 100 - (100 * (client.shape.getSize().y / game.get_window()->getSize().y))) client.pos += 4; // https://www.desmos.com/calculator/21velxom2j
-			}
+		// Paddle movement
+		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && client.pos < 100 - (100 * (client.shape.getSize().y / game.get_window()->getSize().y))){ // https://www.desmos.com/calculator/21velxom2j
+			client.pos += 2; 
+		}
+		else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && client.pos > 0){
+			client.pos -= 2;
 		}
 
 		packet << client.pos;
