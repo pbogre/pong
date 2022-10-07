@@ -28,7 +28,8 @@ int main(){
 	cout << "Listening on port " << PORT << endl
 		 << "Attending client connections..." << endl;
 
-	while(true){
+	unsigned int game_count = 0;
+	while(true) {
 		player clients[2];
 		sf::Packet packet;
 		for(int i = 0; i < 2; i++){
@@ -58,7 +59,7 @@ int main(){
 		clients[1].socket.send(packet);
 		packet.clear();
 
-		cout << "Starting game loop..." << endl;
+		cout << "Starting game #" << game_count << endl;
 
 		thread t1([&]() {
 			while (clients[0].status == sf::Socket::Done) {
@@ -90,5 +91,6 @@ int main(){
 
 		t1.join();
 		t2.join();
+		game_count++;
 	}
 }

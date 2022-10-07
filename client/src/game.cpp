@@ -5,9 +5,10 @@
 #include <cmath>
 #include "game.hpp"
 
-Game::Game(player &client, player &opponent){
+Game::Game(player &client, player &opponent, float step){
     window.create({1100, 650, 32}, "pong", sf::Style::Close);
     window.setFramerateLimit(30);
+    this->step = step;
 
     if(client.side){
         left = &opponent;
@@ -136,7 +137,7 @@ void Game::update(){
         }
     }
     if(ry + ball.size >= window.getSize().y) ball.dy *= -1;
-    if(ry <= 0) ball.dy *= -1;
+    if(ry < (window.getSize().y * step) / 100) ball.dy *= -1;
 
     ball.px += ball.dx;
     ball.py -= ball.dy;

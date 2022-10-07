@@ -6,6 +6,8 @@
 #include "game.cpp"
 using namespace std;
 
+#define STEP_SIZE 2
+
 int main(){
 	cout << "Connecting TCP socket..." << endl
 		 << "IP: " << cfg::IP << endl
@@ -47,7 +49,7 @@ int main(){
 	cout << "Side: " << client.side << endl;
 	cout << "Opponent found. Starting game loop..." << endl;
 
-	Game game(client, opponent);
+	Game game(client, opponent, STEP_SIZE);
 	socket.setBlocking(false);
 	while(game.get_window()->isOpen()){
 		sf::Event event;
@@ -78,10 +80,10 @@ int main(){
 		// Paddle movement
 		if(game.get_window()->hasFocus()){
 			if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && client.pos < 100 - (100 * (client.shape.getSize().y / game.get_window()->getSize().y))){ // https://www.desmos.com/calculator/21velxom2j
-				client.pos += 2;
+				client.pos += STEP_SIZE;
 			}
 			else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && client.pos > 0){
-				client.pos -= 2;
+				client.pos -= STEP_SIZE;
 			}
 		}
 	
@@ -94,7 +96,7 @@ int main(){
 			packet >> opponent.pos >> x >> y;
 			packet.clear();
 
-			//cout << ball.px << ", " << ball.py << " vs. " << x << ", " << y << endl;
+			//cout << ball.px << "	" << ball.py << "	|	" << x << "	" << y << endl;
 			// this gives priority to the first connection, 
 			// because in case of desync the ball position of
 			// the first connection is taken as right and given to 

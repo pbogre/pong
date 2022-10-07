@@ -22,7 +22,7 @@ struct ball{
 
 class Game{
     public:
-        Game(player &client, player &opponent);
+        Game(player &client, player &opponent, float step);
         sf::RenderWindow *get_window();
         void update();
         void draw_text();
@@ -37,6 +37,7 @@ class Game{
 
         float right_x;
         float left_x;
+        float step;
 
         float rebound(float, float, float);
         float middle_point(sf::RectangleShape shape);
