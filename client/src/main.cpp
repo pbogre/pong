@@ -48,6 +48,7 @@ int main(){
 	cout << "Opponent found. Starting game loop..." << endl;
 
 	Game game(client, opponent);
+	socket.setBlocking(false);
 	while(game.get_window()->isOpen()){
 		sf::Event event;
 
@@ -59,7 +60,13 @@ int main(){
 		//  - [bandaid] dont allow resize
 		//  - use percentages for size of paddle & ball and render based on wx & wy
 		while(game.get_window()->pollEvent(event)){
-			if(event.type == sf::Event::Closed) game.get_window()->close();
+			if(event.type == sf::Event::Closed){
+				packet << -1;
+				socket.send(packet);
+				packet.clear();
+
+				game.get_window()->close();
+			}
 			if (event.type == sf::Event::Resized){
         		sf::FloatRect visibleArea(0, 0, event.size.width, event.size.height);
         		game.get_window()->setView(sf::View(visibleArea));
@@ -69,21 +76,33 @@ int main(){
 		}
 
 		// Paddle movement
-		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && client.pos < 100 - (100 * (client.shape.getSize().y / game.get_window()->getSize().y))){ // https://www.desmos.com/calculator/21velxom2j
-			client.pos += 2; 
+		if(game.get_window()->hasFocus()){
+			if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && client.pos < 100 - (100 * (client.shape.getSize().y / game.get_window()->getSize().y))){ // https://www.desmos.com/calculator/21velxom2j
+				client.pos += 2;
+			}
+			else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && client.pos > 0){
+				client.pos -= 2;
+			}
 		}
-		else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && client.pos > 0){
-			client.pos -= 2;
-		}
-
-		packet << client.pos;
+	
+		packet << client.pos << ball.px << ball.py;
 		socket.send(packet);
 		packet.clear();
 
-		if(opponent.pos >= 0){
-			socket.receive(packet);
-			packet >> opponent.pos;
+		if(opponent.pos >= 0 && socket.receive(packet) == sf::Socket::Done){
+			float x, y;
+			packet >> opponent.pos >> x >> y;
 			packet.clear();
+
+			//cout << ball.px << ", " << ball.py << " vs. " << x << ", " << y << endl;
+			// this gives priority to the first connection, 
+			// because in case of desync the ball position of
+			// the first connection is taken as right and given to 
+			// the second connection
+			if( (x != ball.px || y != ball.py) && client.side){
+				ball.px = x;
+				ball.py = y;
+			}
 		}
 
 		game.draw_text();

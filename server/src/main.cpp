@@ -11,7 +11,8 @@ struct player{
 	sf::Socket::Status status;
 	string username;
 
-	float pos;
+	float pos = 0;
+	float bx = 0, by = 0;
 	bool side;
 };
 
@@ -30,7 +31,6 @@ int main(){
 	while(true){
 		player clients[2];
 		sf::Packet packet;
-		float ipos = 0;
 		for(int i = 0; i < 2; i++){
 			if(listener.accept(clients[i].socket) != sf::Socket::Done){
 				cout << "Error while accepting client connection!" << endl;
@@ -39,7 +39,7 @@ int main(){
 
 			cout << "Connection accepted: ";
 			clients[i].socket.receive(packet);
-			packet >> clients[i].username >> ipos;
+			packet >> clients[i].username >> clients[i].pos;
 			cout << clients[i].username << endl;
 			packet.clear();
 
@@ -64,10 +64,7 @@ int main(){
 			while (clients[0].status == sf::Socket::Done) {
 				sf::Packet p;
 				clients[0].status = clients[0].socket.receive(p);
-				p >> clients[0].pos;
-				p.clear();
-
-				p << clients[0].pos;
+				p >> clients[0].pos >> clients[0].bx >> clients[0].by;
 				clients[1].socket.send(p);
 				p.clear();
 			}
@@ -81,10 +78,7 @@ int main(){
 			while (clients[1].status == sf::Socket::Done) {
 				sf::Packet p;
 				clients[1].status = clients[1].socket.receive(p);
-				p >> clients[1].pos;
-				p.clear();
-
-				p << clients[1].pos;
+				p >> clients[1].pos >> clients[1].bx >> clients[1].by;
 				clients[0].socket.send(p);
 				p.clear();
 			}
