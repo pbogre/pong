@@ -1,3 +1,5 @@
+NOTICE: if you are looking to play this, please look at issue #2
+
 # Instructions
 CMake is required to build this project.
 ## Server
