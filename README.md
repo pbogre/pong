@@ -33,5 +33,7 @@ The configuration file is located in `client/src/config.h`
 # To-Do
 
 - [ ] desync handling and warnings testing
+- [ ] if all goes to shit and desync still occurs heavily, maybe just make
+player 1 dictate ball position
 - [x] ~~score desync handling~~
 - [x] ~~desync warning system~~
