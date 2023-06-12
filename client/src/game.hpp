@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+using namespace std;
 
 struct player{
     string username;
