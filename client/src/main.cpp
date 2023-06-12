@@ -73,37 +73,41 @@ int main(){
         		sf::FloatRect visibleArea(0, 0, event.size.width, event.size.height);
         		game.get_window()->setView(sf::View(visibleArea));
 
-				//game.recalc_pos();
-    		}
+			}
+
+			// Paddle movement
+			if (event.type == sf::Event::KeyPressed){
+			  if(event.key.code == sf::Keyboard::Down && client.pos < 100 - (100 * (client.shape.getSize().y / game.get_window()->getSize().y)))
+			    client.pos += STEP_SIZE;
+			  if(event.key.code == sf::Keyboard::Up && client.pos > 0)
+			    client.pos -= STEP_SIZE;
+			}
 		}
 
-		// Paddle movement
-		if(game.get_window()->hasFocus()){
-			if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && client.pos < 100 - (100 * (client.shape.getSize().y / game.get_window()->getSize().y))){ // https://www.desmos.com/calculator/21velxom2j
-				client.pos += STEP_SIZE;
-			}
-			else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && client.pos > 0){
-				client.pos -= STEP_SIZE;
-			}
-		}
-	
-		packet << client.pos << ball.px << ball.py;
+		packet << client.pos << ball.px << ball.py << ball.dx << ball.dy << client.score << opponent.score;
 		socket.send(packet);
 		packet.clear();
 
 		if(opponent.pos >= 0 && socket.receive(packet) == sf::Socket::Done){
-			float x, y;
-			packet >> opponent.pos >> x >> y;
+			float received_x, received_y, received_dx, received_dy;
+			int received_client_score, received_opponent_score;
+			packet >> opponent.pos >> received_x >> received_y >> received_dx >> received_dy >> received_opponent_score >> received_client_score;
 			packet.clear();
 
-			//cout << ball.px << "	" << ball.py << "	|	" << x << "	" << y << endl;
 			// this gives priority to the first connection, 
-			// because in case of desync the ball position of
-			// the first connection is taken as right and given to 
+			// because in case of desync the ball position & velocity 
+			// of the first connection is taken as right and given to 
 			// the second connection
-			if( (x != ball.px || y != ball.py) && client.side){
-				ball.px = x;
-				ball.py = y;
+			if( (received_x != ball.px || received_y != ball.py || received_dx != ball.dx || received_dy != ball.dy) && client.side){
+			  ball.px = received_x;
+			  ball.py = received_y;
+			  ball.dx = received_dx;
+			  ball.dy = received_dy;
+			}
+			// same thing in case of desync with game score
+			if ( ( received_client_score != client.score || received_opponent_score != opponent.score) && client.side){
+			  client.score = received_client_score;
+			  opponent.score = received_opponent_score;
 			}
 		}
 
