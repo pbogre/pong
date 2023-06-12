@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 set(PROJECT_NAME server)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 project(${PROJECT_NAME} LANGUAGES CXX)
 
 include(FetchContent)
