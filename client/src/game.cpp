@@ -27,13 +27,13 @@ Game::Game(player &client, player &opponent, float step){
         score_l.setCharacterSize(72);
         score_l.setString("0");
         score_l.setFillColor(sf::Color(105, 105, 105));
-        score_l.setPosition(window.getSize().x / 3 - (score_l.getLocalBounds().width), 10);
+        score_l.setPosition((float)window.getSize().x / 3 - (score_l.getLocalBounds().width), 10);
 
         score_r.setFont(score_font);
         score_r.setCharacterSize(72);
         score_r.setString("0");
         score_r.setFillColor(sf::Color(105, 105, 105));
-        score_r.setPosition((2 * window.getSize().x / 3) + (score_r.getLocalBounds().width), 10);
+        score_r.setPosition(((float)2 * window.getSize().x / 3) + (score_r.getLocalBounds().width), 10);
 
     name_font.loadFromFile("../res/arial.ttf");
         name_l.setFont(name_font);
@@ -113,8 +113,8 @@ void Game::update(){
             ball.dx -= 0.1;
         }
         else{
-            ball.px = 50 - ((ball.size / window.getSize().x) * 100);
-            ball.py = 50 - ((ball.size / window.getSize().y) * 100);
+            ball.px = 50 - (((float)ball.size / window.getSize().x) * 100);
+            ball.py = 50 - (((float)ball.size / window.getSize().y) * 100);
 
             ball.dx = -0.5;
 
@@ -128,8 +128,8 @@ void Game::update(){
             ball.dx += 0.1;
         }
         else{
-            ball.px = 50 - ((ball.size / window.getSize().x) * 100);
-            ball.py = 50 - ((ball.size / window.getSize().y) * 100);
+            ball.px = 50 - (((float)ball.size / window.getSize().x) * 100);
+            ball.py = 50 - (((float)ball.size / window.getSize().y) * 100);
 
             ball.dx = 0.5;
 
